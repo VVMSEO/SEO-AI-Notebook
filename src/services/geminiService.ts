@@ -1,44 +1,65 @@
-import { GoogleGenAI } from "@google/genai";
+// Используем сторонний сервис RouterAI (OpenAI-совместимое API)
+const API_URL = "https://routerai.ru/api/v1/chat/completions";
 
-let ai: GoogleGenAI | null = null;
+// ВНИМАНИЕ: Хардкодить ключи в коде небезопасно для публичных репозиториев.
+// Рекомендуется перенести этот ключ в .env файл как VITE_ROUTERAI_API_KEY
+const API_KEY = import.meta.env.VITE_ROUTERAI_API_KEY || "sk-YZjmB_SuF7khId64RojYIaiZ6QxLdTmF";
 
-try {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (apiKey) {
-    ai = new GoogleGenAI({ apiKey });
-  } else {
-    console.warn("GEMINI_API_KEY is not set. AI features will not work.");
+async function callRouterAI(prompt: string): Promise<string> {
+  const response = await fetch(API_URL, {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${API_KEY}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      model: "google/gemini-3.1-pro-preview",
+      messages: [
+        { role: "user", content: prompt }
+      ]
+    })
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error("RouterAI API Error:", errorText);
+    throw new Error(`Ошибка API RouterAI: ${response.status}`);
   }
-} catch (error) {
-  console.error("Failed to initialize GoogleGenAI:", error);
+
+  const data = await response.json();
+  return data.choices?.[0]?.message?.content || "";
 }
 
 export async function refineNote(rawNote: string, project: string): Promise<string> {
-  if (!ai) throw new Error("API ключ Gemini не настроен. Пожалуйста, добавьте GEMINI_API_KEY в .env файл.");
-  
-  const response = await ai.models.generateContent({
-    model: "gemini-2.5-flash",
-    contents: `Вы — эксперт по SEO. Превратите следующую краткую заметку в профессиональное, лаконичное и официальное описание задачи для отчета.
+  try {
+    const prompt = `Вы — эксперт по SEO. Превратите следующую краткую заметку в профессиональное, лаконичное и официальное описание задачи для отчета.
     Проект: ${project}
     Заметка: ${rawNote}
     
-    Верните ТОЛЬКО уточненный текст, без лишних слов. Ответ должен быть на русском языке.`,
-  });
-  return response.text || rawNote;
+    Верните ТОЛЬКО уточненный текст, без лишних слов. Ответ должен быть на русском языке.`;
+    
+    const result = await callRouterAI(prompt);
+    return result || rawNote;
+  } catch (error) {
+    console.error("Failed to refine note:", error);
+    return rawNote; // Возвращаем оригинал в случае ошибки
+  }
 }
 
 export async function generateReport(notes: { project: string; refined: string; timestamp: string }[]): Promise<string> {
-  if (!ai) throw new Error("API ключ Gemini не настроен. Пожалуйста, добавьте GEMINI_API_KEY в .env файл.");
-
-  const notesText = notes.map(n => `[${n.timestamp}] [${n.project}] ${n.refined}`).join('\n');
-  const response = await ai.models.generateContent({
-    model: "gemini-2.5-flash",
-    contents: `Вы — эксперт по SEO. На основе следующего списка выполненных задач создайте профессиональный итоговый отчет.
+  try {
+    const notesText = notes.map(n => `[${n.timestamp}] [${n.project}] ${n.refined}`).join('\n');
+    const prompt = `Вы — эксперт по SEO. На основе следующего списка выполненных задач создайте профессиональный итоговый отчет.
     Сгруппируйте задачи по проектам, если их несколько. Используйте профессиональное форматирование (Markdown).
     Отчет должен быть на русском языке.
     
     Задачи:
-    ${notesText}`,
-  });
-  return response.text || "Не удалось создать отчет.";
+    ${notesText}`;
+    
+    const result = await callRouterAI(prompt);
+    return result || "Не удалось создать отчет.";
+  } catch (error) {
+    console.error("Failed to generate report:", error);
+    throw new Error("Не удалось связаться с RouterAI для генерации отчета.");
+  }
 }
