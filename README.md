@@ -1,11 +1,60 @@
-<div align="center">
+# SEO AI Записная книжка
 
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+Умный помощник для SEO-специалистов. Записывайте свои действия обычными словами, а ИИ превратит их в профессиональные отчеты.
 
-  <h1>Built with AI Studio</h2>
+## Подготовка к работе (после клонирования с GitHub)
 
-  <p>The fastest path from prompt to production with Gemini.</p>
+Этот проект использует **React + Vite**, **Firebase** (для авторизации и базы данных) и **Google Gemini API** (для нейросети).
 
-  <a href="https://aistudio.google.com/apps">Start building</a>
+### 1. Установка зависимостей
 
-</div>
+Убедитесь, что у вас установлен [Node.js](https://nodejs.org/). Затем выполните:
+
+```bash
+npm install
+```
+
+### 2. Настройка переменных окружения (Gemini API)
+
+Для работы нейросети требуется API ключ от Google Gemini.
+1. Получите бесплатный ключ на [Google AI Studio](https://aistudio.google.com/app/apikey).
+2. Скопируйте файл `.env.example` и переименуйте его в `.env`.
+3. Вставьте ваш ключ в файл `.env`:
+
+```env
+GEMINI_API_KEY=ваш_ключ_здесь
+```
+
+### 3. Настройка Firebase (База данных и Авторизация)
+
+По умолчанию проект содержит конфигурационный файл `firebase-applet-config.json`, который был сгенерирован в Google AI Studio. **Для полноценного использования в продакшене рекомендуется создать свой собственный проект Firebase:**
+
+1. Перейдите в [Firebase Console](https://console.firebase.google.com/).
+2. Создайте новый проект.
+3. Включите **Authentication** (провайдер Google).
+4. Включите **Firestore Database** (создайте базу данных в тестовом режиме или настройте правила безопасности).
+5. Зарегистрируйте веб-приложение в настройках проекта Firebase и получите конфигурацию (firebaseConfig).
+6. Замените содержимое файла `firebase-applet-config.json` на ваши данные, либо обновите файл `src/firebase.ts`, чтобы он использовал вашу новую конфигурацию напрямую.
+
+### 4. Запуск проекта локально
+
+```bash
+npm run dev
+```
+
+Приложение будет доступно по адресу `http://localhost:3000`.
+
+### 5. Деплой (Публикация в интернете)
+
+Проект легко публикуется на платформах вроде **Vercel** или **Netlify**.
+
+**Важные моменты при деплое:**
+1. **Переменные окружения:** Не забудьте добавить `GEMINI_API_KEY` в настройки Environment Variables на платформе хостинга (Vercel/Netlify).
+2. **Команда сборки:** `npm run build`
+3. **Директория публикации:** `dist`
+
+## Используемые технологии
+
+- **Frontend:** React 19, Vite, Tailwind CSS, Framer Motion (анимации), Lucide React (иконки).
+- **Backend/BaaS:** Firebase (Auth, Firestore).
+- **AI:** `@google/genai` (модель: `gemini-2.5-flash`).

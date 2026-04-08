@@ -1,0 +1,39 @@
+{
+  "entities": {
+    "Note": {
+      "title": "Note",
+      "description": "A refined SEO note",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "User ID of the owner" },
+        "project": { "type": "string" },
+        "raw": { "type": "string" },
+        "refined": { "type": "string" },
+        "timestamp": { "type": "string" },
+        "createdAt": { "type": "timestamp" }
+      },
+      "required": ["uid", "project", "raw", "refined", "timestamp"]
+    },
+    "Template": {
+      "title": "Template",
+      "description": "A reusable note template",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "User ID of the owner" },
+        "text": { "type": "string" },
+        "createdAt": { "type": "timestamp" }
+      },
+      "required": ["uid", "text"]
+    }
+  },
+  "firestore": {
+    "/notes/{noteId}": {
+      "schema": { "$ref": "#/entities/Note" },
+      "description": "Stores user notes"
+    },
+    "/templates/{templateId}": {
+      "schema": { "$ref": "#/entities/Template" },
+      "description": "Stores user templates"
+    }
+  }
+}
