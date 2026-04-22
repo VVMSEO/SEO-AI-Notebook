@@ -391,7 +391,7 @@ export default function App() {
       </header>
 
       {!user ? (
-        <main className="max-w-5xl mx-auto p-6 flex flex-col items-center justify-center min-h-[70vh] text-center">
+        <main className="max-w-6xl mx-auto p-6 flex flex-col items-center justify-center min-h-[70vh] text-center">
           <div className="w-20 h-20 bg-[#1A1A1A] rounded-3xl flex items-center justify-center text-white mb-8 shadow-2xl shadow-[#1A1A1A]/20">
             <Sparkles size={40} />
           </div>
@@ -408,7 +408,7 @@ export default function App() {
           </button>
         </main>
       ) : (
-        <main className="max-w-5xl mx-auto p-6 grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-8">
+        <main className="max-w-6xl mx-auto p-6 grid grid-cols-1 lg:grid-cols-[340px_1fr] gap-10">
         {/* Sidebar / Project Selector */}
         <aside className="space-y-6">
           <div className="bg-white p-5 rounded-2xl border border-[#EDEDED] shadow-sm">
@@ -422,7 +422,7 @@ export default function App() {
                 placeholder="Название проекта..."
                 value={currentProject}
                 onChange={(e) => setCurrentProject(e.target.value)}
-                className="w-full px-3 py-2 text-sm border border-[#EDEDED] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1A1A1A]/10 transition-all mb-3"
+                className="w-full px-4 py-3 text-base border border-[#EDEDED] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1A1A1A]/10 transition-all mb-4"
               />
               {projects.length > 0 ? (
                 <div className="flex flex-wrap gap-2">
@@ -462,10 +462,10 @@ export default function App() {
         {/* Main Content Area */}
         <section className="space-y-6 min-w-0">
           {/* Tabs */}
-          <div className="flex items-center gap-2 bg-white p-1.5 rounded-xl border border-[#EDEDED] shadow-sm w-fit">
+          <div className="flex items-center gap-2 bg-white p-2 rounded-2xl border border-[#EDEDED] shadow-sm w-fit">
             <button
               onClick={() => setActiveTab('input')}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+              className={`px-6 py-2.5 rounded-xl text-base font-semibold transition-all ${
                 activeTab === 'input' 
                 ? 'bg-[#1A1A1A] text-white shadow-md' 
                 : 'text-[#71717A] hover:text-[#1A1A1A] hover:bg-[#F8F9FA]'
@@ -475,14 +475,14 @@ export default function App() {
             </button>
             <button
               onClick={() => setActiveTab('history')}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
+              className={`px-6 py-2.5 rounded-xl text-base font-semibold transition-all flex items-center gap-2 ${
                 activeTab === 'history' 
                 ? 'bg-[#1A1A1A] text-white shadow-md' 
                 : 'text-[#71717A] hover:text-[#1A1A1A] hover:bg-[#F8F9FA]'
               }`}
             >
               История
-              <span className={`px-2 py-0.5 rounded-full text-[10px] ${
+              <span className={`px-2.5 py-0.5 rounded-full text-[11px] ${
                 activeTab === 'history' ? 'bg-white/20' : 'bg-[#F1F1F1]'
               }`}>
                 {notes.length}
@@ -501,19 +501,19 @@ export default function App() {
                 className="space-y-6"
               >
                 {/* Input Form */}
-                <form onSubmit={handleAddNote} className="bg-white p-6 rounded-2xl border border-[#EDEDED] shadow-sm space-y-4">
+                <form onSubmit={handleAddNote} className="bg-white p-10 rounded-3xl border border-[#EDEDED] shadow-sm space-y-8">
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 text-xs font-bold text-[#71717A] uppercase tracking-widest">
-                      <Plus size={12} />
+                    <div className="flex items-center gap-3 text-sm font-bold text-[#71717A] uppercase tracking-widest">
+                      <Plus size={16} />
                       Добавить активность
                     </div>
                     <button
                       type="button"
                       onClick={handleSaveTemplate}
                       disabled={!newNote.trim()}
-                      className="text-[10px] flex items-center gap-1 text-[#A1A1AA] hover:text-[#1A1A1A] disabled:opacity-50 transition-colors uppercase font-bold tracking-wider"
+                      className="text-xs flex items-center gap-1.5 text-[#A1A1AA] hover:text-[#1A1A1A] disabled:opacity-50 transition-colors uppercase font-bold tracking-wider"
                     >
-                      <BookmarkPlus size={12} />
+                      <BookmarkPlus size={14} />
                       Сохранить как шаблон
                     </button>
                   </div>
@@ -547,18 +547,19 @@ export default function App() {
                     placeholder="Что вы сделали сегодня? (например, 'поправил мета-теги для блога')"
                     value={newNote}
                     onChange={(e) => setNewNote(e.target.value)}
-                    className="w-full min-h-[150px] p-4 text-sm border border-[#EDEDED] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1A1A1A]/10 transition-all resize-none bg-[#FAFAFA]"
+                    className="w-full min-h-[320px] p-6 text-lg border border-[#EDEDED] rounded-2xl focus:outline-none focus:ring-4 focus:ring-[#1A1A1A]/5 transition-all resize-none bg-[#FAFAFA]"
                   />
-                  <div className="flex justify-between items-center">
-                    <div className="text-[10px] text-[#A1A1AA] font-mono">
+                  <div className="flex justify-between items-center pt-2">
+                    <div className="text-xs text-[#A1A1AA] font-mono flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
                       {currentProject ? `Проект: ${currentProject}` : 'Выберите или введите название проекта'}
                     </div>
                     <button
                       type="submit"
                       disabled={!newNote.trim() || !currentProject.trim() || isRefining}
-                      className="flex items-center gap-2 px-6 py-2.5 bg-[#1A1A1A] text-white rounded-xl text-sm font-semibold hover:bg-[#333333] transition-all disabled:opacity-50 shadow-lg shadow-[#1A1A1A]/10"
+                      className="flex items-center gap-2 px-8 py-4 bg-[#1A1A1A] text-white rounded-2xl text-base font-bold hover:bg-[#333333] transition-all disabled:opacity-50 shadow-xl shadow-[#1A1A1A]/10 active:scale-[0.98]"
                     >
-                      {isRefining ? <Loader2 className="animate-spin" size={18} /> : <Send size={18} />}
+                      {isRefining ? <Loader2 className="animate-spin" size={20} /> : <Send size={20} />}
                       Уточнить и добавить
                     </button>
                   </div>
@@ -589,7 +590,7 @@ export default function App() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95 }}
-                        className="group bg-white p-5 rounded-2xl border border-[#EDEDED] hover:border-[#1A1A1A]/20 transition-all shadow-sm relative text-left"
+                        className="group bg-white p-8 rounded-3xl border border-[#EDEDED] hover:border-[#1A1A1A]/20 transition-all shadow-sm relative text-left"
                       >
                         {editingNoteId === note.id ? (
                           <div className="space-y-4">
@@ -705,43 +706,42 @@ export default function App() {
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="relative w-full max-w-2xl bg-white rounded-3xl shadow-2xl overflow-hidden"
+              className="relative w-full max-w-4xl bg-white rounded-3xl shadow-2xl overflow-hidden"
             >
-              <div className="px-8 py-6 border-b border-[#EDEDED] flex items-center justify-between bg-[#FAFAFA]">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-[#1A1A1A] rounded-lg flex items-center justify-center text-white">
-                    <FileText size={16} />
+              <div className="px-10 py-8 border-b border-[#EDEDED] flex items-center justify-between bg-[#FAFAFA]">
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 bg-[#1A1A1A] rounded-xl flex items-center justify-center text-white">
+                    <FileText size={20} />
                   </div>
-                  <h2 className="text-lg font-bold tracking-tight">Сгенерированный SEO отчет</h2>
+                  <h2 className="text-xl font-bold tracking-tight">Сгенерированный SEO отчет</h2>
                 </div>
                 <button 
                   onClick={() => setShowReportModal(false)}
-                  className="p-2 hover:bg-[#EDEDED] rounded-full transition-all text-[#71717A]"
+                  className="p-3 hover:bg-[#EDEDED] rounded-full transition-all text-[#71717A]"
                 >
-                  <X size={20} />
+                  <X size={24} />
                 </button>
               </div>
-              <div className="p-8 max-h-[70vh] overflow-y-auto custom-scrollbar">
-                <div className="prose prose-sm max-w-none prose-headings:text-[#1A1A1A] prose-headings:font-bold prose-p:text-[#3F3F46] prose-li:text-[#3F3F46] prose-strong:text-[#1A1A1A]">
+              <div className="p-10 max-h-[75vh] overflow-y-auto custom-scrollbar">
+                <div className="prose prose-base max-w-none prose-headings:text-[#1A1A1A] prose-headings:font-bold prose-p:text-[#3F3F46] prose-li:text-[#3F3F46] prose-strong:text-[#1A1A1A]">
                   <Markdown>{report}</Markdown>
                 </div>
               </div>
-              <div className="px-8 py-6 border-t border-[#EDEDED] flex justify-end gap-3 bg-[#FAFAFA]">
+              <div className="px-10 py-8 border-t border-[#EDEDED] flex justify-end gap-4 bg-[#FAFAFA]">
                 <button
                   onClick={handleDownloadReport}
-                  className="flex items-center gap-2 px-6 py-2 bg-white border border-[#EDEDED] text-[#1A1A1A] rounded-xl text-sm font-semibold hover:bg-[#F8F9FA] transition-all shadow-sm"
+                  className="flex items-center gap-2 px-8 py-3 bg-white border border-[#EDEDED] text-[#1A1A1A] rounded-2xl text-base font-bold hover:bg-[#F8F9FA] transition-all shadow-sm"
                 >
-                  <Download size={16} />
+                  <Download size={18} />
                   Скачать .md
                 </button>
                 <button
                   onClick={() => {
                     navigator.clipboard.writeText(report || '');
-                    alert('Отчет скопирован в буфер обмена!');
                   }}
-                  className="flex items-center gap-2 px-6 py-2 bg-[#1A1A1A] text-white rounded-xl text-sm font-semibold hover:bg-[#333333] transition-all shadow-lg shadow-[#1A1A1A]/10"
+                  className="flex items-center gap-2 px-8 py-3 bg-[#1A1A1A] text-white rounded-2xl text-base font-bold hover:bg-[#333333] transition-all shadow-lg shadow-[#1A1A1A]/10"
                 >
-                  <Copy size={16} />
+                  <Copy size={18} />
                   Копировать
                 </button>
               </div>
