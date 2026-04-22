@@ -16,12 +16,14 @@ import {
   BookmarkPlus,
   LogOut,
   LogIn,
-  Clock
+  Clock,
+  Pencil,
+  Check
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { refineNote, generateReport } from './services/geminiService';
 import { onAuthStateChanged, signInWithPopup, signOut, User } from 'firebase/auth';
-import { collection, addDoc, deleteDoc, onSnapshot, query, where, orderBy, serverTimestamp, doc } from 'firebase/firestore';
+import { collection, addDoc, deleteDoc, updateDoc, onSnapshot, query, where, orderBy, serverTimestamp, doc } from 'firebase/firestore';
 import { auth, db, googleProvider } from './firebase';
 import Markdown from 'react-markdown';
 
@@ -115,6 +117,10 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<'input' | 'history'>('input');
   const [user, setUser] = useState<User | null>(null);
   const [isAuthReady, setIsAuthReady] = useState(false);
+  const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
+  const [editRaw, setEditRaw] = useState('');
+  const [editProject, setEditProject] = useState('');
+  const [isUpdating, setIsUpdating] = useState(false);
   
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -270,6 +276,38 @@ export default function App() {
     } catch (error) {
       handleFirestoreError(error, OperationType.DELETE, `notes/${id}`);
     }
+  };
+
+  const handleUpdateNote = async (id: string) => {
+    if (!editRaw.trim() || !editProject.trim() || !user) return;
+    setIsUpdating(true);
+    try {
+      const noteToUpdate = notes.find(n => n.id === id);
+      let refined = noteToUpdate?.refined || '';
+      
+      // Re-refine if anything changed as the project context might affect the result
+      if (editRaw !== noteToUpdate?.raw || editProject !== noteToUpdate?.project) {
+        refined = await refineNote(editRaw, editProject);
+      }
+
+      await updateDoc(doc(db, 'notes', id), {
+        project: editProject,
+        raw: editRaw,
+        refined,
+        updatedAt: serverTimestamp()
+      });
+      setEditingNoteId(null);
+    } catch (error) {
+      handleFirestoreError(error, OperationType.UPDATE, `notes/${id}`);
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const startEditing = (note: Note) => {
+    setEditingNoteId(note.id);
+    setEditRaw(note.raw);
+    setEditProject(note.project);
   };
 
   const handleGenerateReport = async () => {
@@ -551,36 +589,87 @@ export default function App() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95 }}
-                        className="group bg-white p-5 rounded-2xl border border-[#EDEDED] hover:border-[#1A1A1A]/20 transition-all shadow-sm relative"
+                        className="group bg-white p-5 rounded-2xl border border-[#EDEDED] hover:border-[#1A1A1A]/20 transition-all shadow-sm relative text-left"
                       >
-                        <div className="flex justify-between items-start mb-3">
-                          <div className="flex items-center gap-3">
-                            <span className="px-2 py-0.5 bg-[#F1F1F1] text-[#1A1A1A] text-[10px] font-bold rounded uppercase tracking-wider">
-                              {note.project}
-                            </span>
-                            <div className="flex items-center gap-1.5 text-[10px] text-[#A1A1AA] font-medium">
-                              <Clock size={10} />
-                              {formatTime(note)}
+                        {editingNoteId === note.id ? (
+                          <div className="space-y-4">
+                            <div className="flex flex-col gap-2">
+                              <label className="text-[10px] font-bold text-[#71717A] uppercase tracking-wider">Проект</label>
+                              <input 
+                                type="text"
+                                value={editProject}
+                                onChange={(e) => setEditProject(e.target.value)}
+                                className="w-full px-3 py-1.5 text-xs border border-[#EDEDED] rounded-lg focus:outline-none focus:ring-1 focus:ring-[#1A1A1A]/10 bg-[#FAFAFA]"
+                              />
+                            </div>
+                            <div className="flex flex-col gap-2">
+                              <label className="text-[10px] font-bold text-[#71717A] uppercase tracking-wider">Содержание (оригинал)</label>
+                              <textarea 
+                                value={editRaw}
+                                onChange={(e) => setEditRaw(e.target.value)}
+                                className="w-full min-h-[100px] p-3 text-xs border border-[#EDEDED] rounded-lg focus:outline-none focus:ring-1 focus:ring-[#1A1A1A]/10 resize-none bg-[#FAFAFA]"
+                              />
+                            </div>
+                            <div className="flex items-center justify-end gap-2 pt-2">
+                              <button 
+                                onClick={() => setEditingNoteId(null)}
+                                className="p-2 text-[#71717A] hover:bg-gray-100 rounded-lg transition-all"
+                                title="Отмена"
+                              >
+                                <X size={16} />
+                              </button>
+                              <button 
+                                onClick={() => handleUpdateNote(note.id)}
+                                disabled={isUpdating}
+                                className="flex items-center gap-2 px-4 py-2 bg-[#1A1A1A] text-white rounded-lg text-xs font-semibold hover:bg-[#333333] transition-all disabled:opacity-50"
+                              >
+                                {isUpdating ? <Loader2 className="animate-spin" size={14} /> : <Check size={14} />}
+                                Сохранить изменения
+                              </button>
                             </div>
                           </div>
-                          <button 
-                            onClick={() => handleDeleteNote(note.id)}
-                            className="text-[#A1A1AA] hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all p-1"
-                          >
-                            <Trash2 size={14} />
-                          </button>
-                        </div>
-                        <div className="space-y-2 min-w-0">
-                          <div className="prose prose-sm max-w-none text-sm font-medium text-[#1A1A1A] leading-relaxed break-words prose-a:break-all prose-p:leading-relaxed prose-pre:max-w-full prose-pre:overflow-x-auto">
-                            <Markdown>{note.refined}</Markdown>
-                          </div>
-                          <div className="pt-2 border-t border-[#F5F5F5] flex items-center gap-2 min-w-0">
-                            <span className="text-[10px] text-[#A1A1AA] italic shrink-0">Оригинал:</span>
-                            <p className="text-[10px] text-[#A1A1AA] truncate italic flex-1 min-w-0">
-                              {note.raw}
-                            </p>
-                          </div>
-                        </div>
+                        ) : (
+                          <>
+                            <div className="flex justify-between items-start mb-3">
+                              <div className="flex items-center gap-3">
+                                <span className="px-2 py-0.5 bg-[#F1F1F1] text-[#1A1A1A] text-[10px] font-bold rounded uppercase tracking-wider">
+                                  {note.project}
+                                </span>
+                                <div className="flex items-center gap-1.5 text-[10px] text-[#A1A1AA] font-medium">
+                                  <Clock size={10} />
+                                  {formatTime(note)}
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <button 
+                                  onClick={() => startEditing(note)}
+                                  className="text-[#A1A1AA] hover:text-[#1A1A1A] opacity-0 group-hover:opacity-100 transition-all p-1"
+                                  title="Редактировать"
+                                >
+                                  <Pencil size={14} />
+                                </button>
+                                <button 
+                                  onClick={() => handleDeleteNote(note.id)}
+                                  className="text-[#A1A1AA] hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all p-1"
+                                  title="Удалить"
+                                >
+                                  <Trash2 size={14} />
+                                </button>
+                              </div>
+                            </div>
+                            <div className="space-y-2 min-w-0">
+                              <div className="prose prose-sm max-w-none text-sm font-medium text-[#1A1A1A] leading-relaxed break-words prose-a:break-all prose-p:leading-relaxed prose-pre:max-w-full prose-pre:overflow-x-auto">
+                                <Markdown>{note.refined}</Markdown>
+                              </div>
+                              <div className="pt-2 border-t border-[#F5F5F5] flex items-center gap-2 min-w-0">
+                                <span className="text-[10px] text-[#A1A1AA] italic shrink-0">Оригинал:</span>
+                                <p className="text-[10px] text-[#A1A1AA] truncate italic flex-1 min-w-0">
+                                  {note.raw}
+                                </p>
+                              </div>
+                            </div>
+                          </>
+                        )}
                       </motion.div>
                     ))}
                   </AnimatePresence>
@@ -632,9 +721,9 @@ export default function App() {
                   <X size={20} />
                 </button>
               </div>
-              <div className="p-8 max-h-[70vh] overflow-y-auto prose prose-sm max-w-none">
-                <div className="whitespace-pre-wrap font-sans text-sm leading-relaxed text-[#333333]">
-                  {report}
+              <div className="p-8 max-h-[70vh] overflow-y-auto custom-scrollbar">
+                <div className="prose prose-sm max-w-none prose-headings:text-[#1A1A1A] prose-headings:font-bold prose-p:text-[#3F3F46] prose-li:text-[#3F3F46] prose-strong:text-[#1A1A1A]">
+                  <Markdown>{report}</Markdown>
                 </div>
               </div>
               <div className="px-8 py-6 border-t border-[#EDEDED] flex justify-end gap-3 bg-[#FAFAFA]">

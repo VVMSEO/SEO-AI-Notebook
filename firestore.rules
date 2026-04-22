@@ -30,13 +30,14 @@ service cloud.firestore {
     // Domain Validators
     // ===============================================================
     function isValidNote(data) {
-      return hasOnlyAllowedFields(['uid', 'project', 'raw', 'refined', 'timestamp', 'createdAt']) &&
+      return hasOnlyAllowedFields(['uid', 'project', 'raw', 'refined', 'timestamp', 'createdAt', 'updatedAt']) &&
              data.uid is string && data.uid.size() > 0 && data.uid.size() < 100 &&
              data.project is string && data.project.size() > 0 && data.project.size() < 200 &&
              data.raw is string && data.raw.size() > 0 && data.raw.size() < 10000 &&
              data.refined is string && data.refined.size() > 0 && data.refined.size() < 10000 &&
              data.timestamp is string && data.timestamp.size() > 0 && data.timestamp.size() < 100 &&
-             (!('createdAt' in data) || data.createdAt is timestamp);
+             (!('createdAt' in data) || data.createdAt is timestamp) &&
+             (!('updatedAt' in data) || data.updatedAt is timestamp);
     }
 
     function isValidTemplate(data) {
