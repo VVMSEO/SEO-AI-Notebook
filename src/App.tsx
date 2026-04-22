@@ -310,7 +310,7 @@ export default function App() {
             <Sparkles size={20} />
           </div>
           <div>
-            <h1 className="text-lg font-semibold tracking-tight">SEO AI Записная книжка</h1>
+            <h1 className="text-lg font-semibold tracking-tight">SEO AI Notebook</h1>
             <p className="text-xs text-[#71717A] font-medium uppercase tracking-wider">Умный помощник для отчетов</p>
           </div>
         </div>
@@ -357,7 +357,7 @@ export default function App() {
           <div className="w-20 h-20 bg-[#1A1A1A] rounded-3xl flex items-center justify-center text-white mb-8 shadow-2xl shadow-[#1A1A1A]/20">
             <Sparkles size={40} />
           </div>
-          <h2 className="text-3xl font-bold tracking-tight mb-4">Добро пожаловать в SEO AI Записную книжку</h2>
+          <h2 className="text-3xl font-bold tracking-tight mb-4">Добро пожаловать в SEO AI Notebook</h2>
           <p className="text-[#71717A] max-w-md mx-auto mb-8 leading-relaxed">
             Умный помощник для SEO-специалистов. Записывайте свои действия обычными словами, а ИИ превратит их в профессиональные отчеты.
           </p>
