@@ -3,7 +3,7 @@ const API_URL = "https://routerai.ru/api/v1/chat/completions";
 
 // ВНИМАНИЕ: Хардкодить ключи в коде небезопасно для публичных репозиториев.
 // Рекомендуется перенести этот ключ в .env файл как VITE_ROUTERAI_API_KEY
-const API_KEY = import.meta.env.VITE_ROUTERAI_API_KEY || "sk-YZjmB_SuF7khId64RojYIaiZ6QxLdTmF";
+const API_KEY = import.meta.env.VITE_ROUTERAI_API_KEY || "sk-qbf6ACgy2tmghGMBdty2uA3lWSHY98w7";
 
 async function callRouterAI(prompt: string): Promise<string> {
   const response = await fetch(API_URL, {
@@ -13,7 +13,7 @@ async function callRouterAI(prompt: string): Promise<string> {
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
-      model: "google/gemini-3.1-pro-preview",
+      model: "anthropic/claude-sonnet-4.6",
       messages: [
         { role: "user", content: prompt }
       ]
