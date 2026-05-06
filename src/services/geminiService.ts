@@ -3,7 +3,7 @@ const API_URL = "https://routerai.ru/api/v1/chat/completions";
 
 // ВНИМАНИЕ: Хардкодить ключи в коде небезопасно для публичных репозиториев.
 // Рекомендуется перенести этот ключ в .env файл как VITE_ROUTERAI_API_KEY
-const API_KEY = import.meta.env.VITE_ROUTERAI_API_KEY || "sk-qbf6ACgy2tmghGMBdty2uA3lWSHY98w7";
+const API_KEY = import.meta.env.VITE_ROUTERAI_API_KEY || "sk-idWLIk8WBHJJiwn-Y2oyMNdW0ckjsfIa";
 
 async function callRouterAI(prompt: string): Promise<string> {
   const response = await fetch(API_URL, {
